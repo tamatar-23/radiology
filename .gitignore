@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints
+
+# Node / Frontend
+node_modules/
+.next/
+out/
+build/
+.pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Data & Model Weights (Do not commit heavy files)
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+
+# IDE & System
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
