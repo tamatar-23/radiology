@@ -2,108 +2,121 @@
 API Endpoint Router
 Owner: Shivam (Backend & APIs)
 
-Defines FastAPI routing endpoints for image upload, scan analysis, and radiology report retrieval.
+Defines thin FastAPI route handlers that delegate file storage, validation,
+and AI pipeline orchestration to the service layer.
 """
 
-from fastapi import APIRouter, UploadFile, File, HTTPException, Depends
-from typing import List, Optional
-import uuid
-import datetime
+import os
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
+from fastapi.responses import FileResponse
+from sqlalchemy.orm import Session
 
+from backend.app.config import settings
+from backend.app.db.database import get_db, check_db_connection
 from backend.app.schemas.radiology import (
     HealthCheckResponse,
     ScanUploadResponse,
     AnalysisRequest,
     AnalysisResponse,
-    EvidenceItem,
     ReportResponse,
 )
-from ai.rag.agent import RadiologyRAGAgent
+from backend.app.services.storage_service import StorageService
+from backend.app.services.analysis_service import AnalysisService
+from ai.config import AIConfig
 
 router = APIRouter()
-rag_agent = RadiologyRAGAgent()
+storage_service = StorageService()
+analysis_service = AnalysisService()
 
 
 @router.get("/health", response_model=HealthCheckResponse, tags=["Health"])
 async def get_health():
     """
-    Health check endpoint to verify backend service status.
+    Health check endpoint reporting backend status, database connectivity,
+    current AI execution mode (mock vs real), and integration readiness.
     """
+    db_ok, db_status = check_db_connection()
+    try:
+        ai_mode = settings.get_ai_mode()
+    except ValueError:
+        ai_mode = "mock"
+
+    real_status = AIConfig.validate_real_mode_status()
+
     return HealthCheckResponse(
-        status="healthy",
-        service="radiology-backend"
+        status="healthy" if db_ok else "degraded",
+        service="radiology-backend",
+        database_status=db_status,
+        ai_mode="real" if ai_mode == "real" else "mock",
+        modality_scope="Chest X-Ray (DX)",
+        integrations={
+            "vision_model": (
+                "demo-cxr-densenet121-mock (simulated)"
+                if ai_mode == "mock"
+                else f"{AIConfig.VISION_MODEL_NAME} ({'ready' if real_status['vision_ready'] else 'missing weights'})"
+            ),
+            "explainability": (
+                "disabled in mock mode (no fake heatmaps)"
+                if ai_mode == "mock"
+                else ("ready" if real_status["vision_ready"] else "unavailable")
+            ),
+            "rag_vector_store": (
+                "local open-access guideline corpus (mock)"
+                if ai_mode == "mock"
+                else f"ChromaDB ({'ready' if real_status['rag_ready'] else 'uninitialized'})"
+            ),
+            "llm_synthesizer": (
+                "template report synthesizer (mock)"
+                if ai_mode == "mock"
+                else f"{AIConfig.LLM_MODEL} ({'ready' if real_status['llm_ready'] else 'missing API key'})"
+            ),
+        },
     )
 
 
 @router.post("/api/upload", response_model=ScanUploadResponse, tags=["Radiology API"])
-async def upload_scan(file: UploadFile = File(...)):
+async def upload_scan(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+):
     """
-    Upload DICOM or medical image file for processing.
+    Validate and store an uploaded Chest X-Ray image (PNG or JPEG) and persist scan metadata.
     """
-    if not file.filename:
-        raise HTTPException(status_code=400, detail="No file provided")
-
-    scan_id = f"scan_{uuid.uuid4().hex[:8]}"
-    file_type = file.content_type or "image/png"
-
-    # TODO (Shivam / Shanks): Store uploaded file to data/raw/ or S3 storage
-    return ScanUploadResponse(
-        scan_id=scan_id,
-        filename=file.filename,
-        file_type=file_type,
-        message="Scan uploaded successfully to development mock storage"
-    )
+    return await storage_service.save_upload(file=file, db=db)
 
 
 @router.post("/api/analyze", response_model=AnalysisResponse, tags=["Radiology API"])
-async def analyze_scan(request: Optional[AnalysisRequest] = None):
+async def analyze_scan(
+    request: AnalysisRequest,
+    db: Session = Depends(get_db),
+):
     """
-    Triggers multimodal radiology AI analysis pipeline.
-    Returns structured mock findings, impression, confidence, and retrieved evidence.
+    Trigger the Chest X-Ray preprocessing, multi-label classification, Grad-CAM check,
+    and 5-stage Agentic RAG pipeline for an uploaded scan.
     """
-    scan_id = request.scan_id if request and request.scan_id else f"scan_{uuid.uuid4().hex[:8]}"
-
-    # Invoke AI RAG Agent (currently returns mock payload per requirements)
-    pipeline_result = rag_agent.run_pipeline(
-        vision_findings=["Mock finding for development: Subtle opacity in right lower lobe."]
-    )
-
-    return AnalysisResponse(
-        status="success",
-        scan_id=scan_id,
-        findings=pipeline_result["findings"],
-        impression=pipeline_result["impression"],
-        confidence=pipeline_result["confidence"],
-        evidence=[
-            EvidenceItem(
-                source=item.get("source", "Mock Medical Source"),
-                text=item.get("text", "Mock retrieved evidence")
-            )
-            for item in pipeline_result.get("evidence", [])
-        ]
-    )
+    return analysis_service.run_analysis(request=request, db=db)
 
 
-@router.get("/api/report/{id}", response_model=ReportResponse, tags=["Radiology API"])
-async def get_report(id: str):
+@router.get("/api/report/{report_id}", response_model=ReportResponse, tags=["Radiology API"])
+async def get_report(
+    report_id: str,
+    db: Session = Depends(get_db),
+):
     """
-    Retrieve generated radiology report by ID.
+    Retrieve a persisted radiology analysis report by its report_id.
     """
-    return ReportResponse(
-        id=id,
-        scan_id=f"scan_{id}",
-        created_at=datetime.datetime.utcnow(),
-        impression="Mock radiology impression: Findings suggest mild atelectasis or early infiltrates. Correlate clinically.",
-        findings=[
-            "Mock finding for development: Subtle right lower lobe ground-glass opacity.",
-            "Cardiomediastinal silhouette is within normal limits.",
-            "No pneumothorax or pleural effusion."
-        ],
-        confidence=0.85,
-        evidence=[
-            EvidenceItem(
-                source="Mock Medical Reference Manual Vol 4",
-                text="Pulmonary opacity in lower lung fields with sub-centimeter margin typically indicates localized inflammation or micro-atelectasis."
-            )
-        ]
-    )
+    return analysis_service.get_report_by_id(report_id=report_id, db=db)
+
+
+@router.get("/api/scans/{scan_id}/image", tags=["Radiology API"])
+async def get_scan_image(
+    scan_id: str,
+    db: Session = Depends(get_db),
+):
+    """
+    Serve the persisted Chest X-Ray image file for display in the viewer.
+    """
+    scan = storage_service.get_scan_or_404(scan_id=scan_id, db=db)
+    if not os.path.isfile(scan.file_path):
+        raise HTTPException(status_code=404, detail="Scan image file is missing on disk.")
+    return FileResponse(path=scan.file_path, media_type=scan.file_type, filename=scan.filename)

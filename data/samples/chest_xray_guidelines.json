@@ -1,0 +1,37 @@
+[
+  {
+    "document_id": "fleischner-glossary-2008-atelectasis",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Atelectasis",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["atelectasis", "collapse", "volume loss", "opacity", "subsegmental", "linear"],
+    "content": "Atelectasis refers to reduced inflation of all or part of the lung. Radiographic findings include increased attenuation or opacity in the affected lung parenchyma accompanied by direct or indirect signs of volume loss, such as displacement of interlobar fissures, elevation of the ipsilateral hemidiaphragm, mediastinal shift toward the affected side, or crowding of pulmonary vessels and bronchi. Subsegmental (discoid or platelike) atelectasis commonly appears as linear horizontal or oblique opacities in the lower lung zones."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-consolidation",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Consolidation",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["consolidation", "pneumonia", "infiltration", "airspace", "opacity", "air bronchogram"],
+    "content": "Consolidation appears on chest radiographs as a homogeneous increase in pulmonary parenchymal attenuation that obscures the margins of vessels and airway walls. An air bronchogram may be present when air-filled bronchi traverse the opacified alveoli. Consolidation indicates replacement of alveolar air by fluid, pus, blood, cells, or other material, and is a classic radiographic manifestation of bacterial pneumonia, pulmonary hemorrhage, or organizing pneumonia."
+  },
+  {
+    "document_id": "acr-chest-radiography-pleural-effusion",
+    "document_title": "ACR Appropriateness Criteria & Thoracic Radiography Reference — Pleural Effusion",
+    "source_url": "https://www.acr.org/Clinical-Resources/ACR-Appropriateness-Criteria",
+    "keywords": ["effusion", "pleural effusion", "costophrenic", "blunting", "meniscus", "fluid"],
+    "content": "On upright posteroanterior and lateral chest radiographs, free pleural fluid typically accumulates in the most dependent recesses of the thoracic cavity, producing blunting of the posterior and lateral costophrenic sulci with a characteristic concave meniscus sign. Larger pleural effusions cause homogeneous basal opacification obscuring the ipsilateral hemidiaphragm and may shift the mediastinum contralaterally unless accompanied by underlying lobar atelectasis."
+  },
+  {
+    "document_id": "thoracic-radiography-cardiomegaly-edema",
+    "document_title": "Standard Thoracic Radiography Criteria — Cardiomegaly and Pulmonary Edema",
+    "source_url": "https://radiopaedia.org/articles/cardiothoracic-ratio",
+    "keywords": ["cardiomegaly", "edema", "cardiothoracic", "silhouette", "vascular", "interstitial"],
+    "content": "On a standard upright posteroanterior (PA) chest radiograph, the cardiothoracic ratio (CTR) is measured as the maximal horizontal cardiac diameter divided by the maximal internal thoracic diameter; a ratio exceeding 0.50 is a commonly cited radiographic indicator of cardiomegaly on PA projections. Associated pulmonary venous hypertension and interstitial pulmonary edema may manifest with cephalization of pulmonary vessels, peribronchial cuffing, and septal lines (Kerley B lines)."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-pneumothorax-nodule",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pneumothorax and Pulmonary Nodule",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["pneumothorax", "nodule", "mass", "pleural line", "emphysema", "fibrosis"],
+    "content": "Pneumothorax refers to the presence of gas in the pleural space, identified on chest radiography by a visible visceral pleural line with absence of pulmonary vascular markings peripheral to that line. A pulmonary nodule is defined as a rounded or irregular opacity, well or poorly defined, measuring up to 3 cm in diameter on chest radiographs or CT, whereas focal pulmonary lesions exceeding 3 cm in diameter are classified as pulmonary masses."
+  }
+]

@@ -12,6 +12,7 @@ downloads/
 eggs/
 .eggs/
 lib/
+!frontend/lib/
 lib64/
 parts/
 sdist/
@@ -23,6 +24,7 @@ wheels/
 .venv
 venv/
 ENV/
+.pytest_cache/
 
 # Jupyter
 .ipynb_checkpoints
@@ -32,6 +34,7 @@ node_modules/
 .next/
 out/
 build/
+*.tsbuildinfo
 .pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
@@ -43,11 +46,18 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# Data & Model Weights (Do not commit heavy files)
+# Local Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Data, Uploads & Model Weights (Do not commit heavy files or uploaded scans)
 data/raw/*
 !data/raw/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+data/uploads/*
+!data/uploads/.gitkeep
 *.pt
 *.pth
 *.bin

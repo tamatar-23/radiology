@@ -3,40 +3,60 @@ FastAPI Main Application Entrypoint
 Owner: Shivam (Backend & Deployment)
 """
 
-import os
+import logging
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from backend.app.config import settings
 from backend.app.api.endpoints import router as api_router
 from backend.app.db.database import init_db
 
-app = FastAPI(
-    title="Multimodal Agentic Radiology Assistant API",
-    description="Backend API for AI-powered DICOM/image analysis, disease classification, agentic RAG, and radiology reporting.",
-    version="0.1.0"
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(name)s | %(message)s",
 )
+logger = logging.getLogger(__name__)
 
-# CORS configuration for Next.js frontend communication
-cors_origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://127.0.0.1:3000")
-origins = [origin.strip() for origin in cors_origins_str.split(",") if origin.strip()]
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info(
+        "Starting %s (AI_MODE=%s)",
+        settings.PROJECT_NAME,
+        settings.get_ai_mode(),
+    )
+    init_db()
+    yield
+
+
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    description=(
+        "Research prototype backend API for Chest X-Ray image preprocessing, "
+        "multi-label abnormality classification, Grad-CAM explainability, and Agentic RAG reporting."
+    ),
+    version=settings.VERSION,
+    lifespan=lifespan,
+)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=settings.get_cors_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include API Router
 app.include_router(api_router)
 
-@app.on_event("startup")
-def on_startup():
-    # Initialize DB tables if needed
-    init_db()
 
 if __name__ == "__main__":
     import uvicorn
-    host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", "8000"))
-    uvicorn.run("backend.app.main:app", host=host, port=port, reload=True)
+
+    uvicorn.run(
+        "backend.app.main:app",
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=True,
+    )

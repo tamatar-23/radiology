@@ -1,21 +1,47 @@
-version: '3.8'
-
 services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: radiology
+      POSTGRES_PASSWORD: radiology_pass
+      POSTGRES_DB: radiology_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U radiology -d radiology_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     ports:
       - "8000:8000"
     environment:
       - HOST=0.0.0.0
       - PORT=8000
+      - AI_MODE=${AI_MODE:-mock}
       - DATABASE_URL=postgresql://radiology:radiology_pass@db:5432/radiology_db
+      - CORS_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+      - UPLOAD_DIR=/app/data/uploads
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
       - ./ai:/app/ai
+      - ./data/samples:/app/data/samples
+      - ./data/uploads:/app/data/uploads
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   frontend:
     build:
@@ -27,18 +53,6 @@ services:
       - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000
     depends_on:
       - backend
-
-  db:
-    image: postgres:15-alpine
-    restart: always
-    environment:
-      POSTGRES_USER: radiology
-      POSTGRES_PASSWORD: radiology_pass
-      POSTGRES_DB: radiology_db
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
 
 volumes:
   postgres_data:
