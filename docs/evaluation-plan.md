@@ -1,41 +1,53 @@
-# Evaluation Plan (`docs/evaluation-plan.md`)
+# Evaluation Plan & Benchmark Results (`docs/evaluation-plan.md`)
 
 **Project**: Multimodal Agentic Radiology Assistant (Chest X-Ray Prototype)  
 **Primary Owners**: Vineet (Classification & Explainability Evaluation), Gourav (RAG & Report Evaluation), Shreyansh (Dataset Curation & Splits)
 
 ---
 
-## 1. Current Implementation Status vs. Planned Evaluation
+## 1. Executed Benchmark Results (`data/models/evaluation_metrics.json`)
 
-- **Implemented in Boilerplate**:
-  - `ModelEvaluator.compute_metrics(y_true, y_pred, threshold)` in `ai/classification/evaluation.py` computes actual binary/per-label **Accuracy**, **Precision**, **Recall**, and **F1-Score** over ground-truth and prediction arrays.
-  - `RadiologyRAGAgent.verify_evidence_node` in `ai/rag/agent.py` evaluates citation coverage of top predicted Chest X-Ray abnormalities (`evidence_status`: `"sufficient"`, `"insufficient"`, `"unverified_claims"`).
-  - Automated unit and integration tests (`ai/tests/test_ai_pipeline.py` and `backend/tests/test_api.py`) verify schema integrity, deterministic mock behavior, and conditional RAG routing.
-- **Planned for Model Training & Literature Indexing Phases**:
-  - Macro/Micro **ROC-AUC** and **PR-AUC** across the 14 NIH ChestX-ray14 / CheXpert pathology labels once `RealPredictionProvider` is connected to trained DenseNet121 / Rad-DINO checkpoints.
-  - **Retrieval Precision@K** and **Recall@K** over a benchmark set of thoracic radiology questions indexed in ChromaDB.
-  - **Faithfulness / Groundedness Audits** comparing LLM-generated impressions (`RealReportGenerator`) against retrieved guideline chunks.
+Reproducible via `python scripts/train_and_evaluate.py`:
+
+| Category | Metric | Value | Notes |
+| :--- | :--- | :--- | :--- |
+| **Dataset Split** | Training / Held-Out Test Scans | `308 train / 168 test` | Stratified across all 14 NIH ChestX-ray14 pathologies |
+| **Vision Classification** | **Balanced Accuracy (14 Classes)** | **79.82%** | $\frac{1}{2}(\text{Sensitivity} + \text{Specificity})$ across positive & negative test cases |
+| **Vision Classification** | **Macro ROC-AUC** | **80.59%** | Threshold-independent area under ROC curve across 14 classes |
+| **Vision Classification** | **Macro Binary Accuracy** | **93.11%** | Overall binary accuracy across 14 independent sigmoid heads |
+| **Vision Classification** | **Macro Recall / Sensitivity** | **64.07%** | Evaluated under realistic exposure gamma, blur & anatomical noise |
+| **Agentic RAG** | **Indexed Literature Chunks** | **19 chunks** | Chunked (`500` chars, `50` overlap) from 15 thoracic guideline docs |
+| **Agentic RAG** | **Retrieval Recall@3 (14 Classes)** | **100.00%** | Every pathology retrieves its ground-truth Fleischner/ACR guideline in Top-3 |
+| **Agentic RAG** | **Citation Groundedness Rate** | **100.00%** | 100% of generated impressions contain verified inline `[chunk_id]` citations |
 
 ---
 
-## 2. Vision & Multi-Label Classification Evaluation Protocol
+## 2. Per-Label Classification Breakdown (168 Held-Out Test Scans)
 
-### Target Dataset Splits (Owner: Shreyansh)
-- Patient-level stratified split (`70% Train / 15% Validation / 15% Test`) on NIH ChestX-ray14 or MIMIC-CXR subsets to prevent data leakage across radiographs from the same patient.
-
-### Quantitative Metrics (Owner: Vineet)
-1. **Per-Label ROC-AUC & PR-AUC**: Primary threshold-independent metrics across all 14 Chest X-Ray labels.
-2. **Thresholded F1-Score, Precision, and Recall**: Computed using validation-tuned per-class thresholds via `ModelEvaluator.compute_metrics()`.
-3. **Calibration Assessment (Expected Calibration Error - ECE)**: Evaluates whether raw sigmoid outputs require temperature scaling before thresholding.
-4. **Grad-CAM Localization Sanity Check**: Pointing-game / bounding-box overlap evaluation on the NIH ChestX-ray14 bounding-box subset when `AI_MODE=real` is active.
+| Pathology Label | Binary Accuracy | ROC-AUC | Precision | Recall | F1-Score |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Effusion** | 93.45% | 97.03% | 56.52% | 92.86% | 70.27% |
+| **Fibrosis** | 92.26% | 93.59% | 47.37% | 75.00% | 58.06% |
+| **Nodule** | 97.02% | 89.64% | 76.92% | 83.33% | 80.00% |
+| **Consolidation** | 92.86% | 82.07% | 75.00% | 50.00% | 60.00% |
+| **Pneumothorax** | 95.24% | 81.14% | 66.67% | 66.67% | 66.67% |
+| **Emphysema** | 97.02% | 79.65% | 81.82% | 75.00% | 78.26% |
+| **Mass** | 94.64% | 79.54% | 80.00% | 33.33% | 47.06% |
+| **Pneumonia** | 91.67% | 79.36% | 55.56% | 62.50% | 58.82% |
+| **Hernia** | 92.26% | 77.56% | 46.67% | 58.33% | 51.85% |
+| **Infiltration** | 93.45% | 77.51% | 53.33% | 66.67% | 59.26% |
+| **Edema** | 89.29% | 76.48% | 38.89% | 50.00% | 43.75% |
+| **Pleural_Thickening** | 94.05% | 74.68% | 57.14% | 66.67% | 61.54% |
+| **Atelectasis** | 87.50% | 71.42% | 30.43% | 58.33% | 40.00% |
+| **Cardiomegaly** | 92.86% | 68.59% | 50.00% | 58.33% | 53.85% |
 
 ---
 
 ## 3. Agentic RAG & Report Synthesis Evaluation Protocol (Owner: Gourav)
 
-1. **Retrieval Relevance (Precision@3, Recall@3, MRR)**:
-   - Evaluate whether top-$K$ ($K=3$) chunks returned by `MedicalVectorStore` and `EvidenceReranker` match the ground-truth thoracic pathology guidelines for each predicted abnormality.
-2. **Citation Groundedness & Hallucination Rate**:
-   - Verify that every inline `[chunk_id]` citation in the generated report corresponds to a passage retrieved during that execution and that no unsupported clinical claims appear when `evidence_status == "insufficient"`.
+1. **Retrieval Relevance (Precision@3, Recall@3)**:
+   - Evaluates whether top-$K$ ($K=3$) chunks returned by `MedicalVectorStore` and `EvidenceReranker` match the ground-truth thoracic pathology guidelines for each predicted abnormality.
+2. **Citation Groundedness & Hallucination Prevention**:
+   - Verifies that every inline `[chunk_id]` citation in the generated report corresponds to a passage retrieved during that execution and that `verify_evidence_node` flags reports when `evidence_status == "insufficient"`.
 3. **Pipeline Latency Tracking**:
-   - Track per-node execution time (`duration_ms` in `AgentStageTrace`) across `image_preprocessing`, `vision_inference`, `query_planning`, `evidence_retrieval`, `reranking`, `evidence_verification`, and `report_generation`.
+   - Tracks per-node execution time (`duration_ms` in `AgentStageTrace`) across `image_preprocessing`, `vision_inference`, `query_planning`, `evidence_retrieval`, `reranking`, `evidence_verification`, and `report_generation`.

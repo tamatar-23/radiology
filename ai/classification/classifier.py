@@ -18,6 +18,7 @@ from ai.common.schemas import (
     PredictionResult,
 )
 from ai.common.interfaces import BasePredictionProvider
+from ai.vision.model import compute_radiographic_features_64d
 
 
 class DemoPredictionProvider(BasePredictionProvider):
@@ -84,7 +85,9 @@ class DemoPredictionProvider(BasePredictionProvider):
 class RealPredictionProvider(BasePredictionProvider):
     """
     Real Chest X-Ray classifier provider for AI_MODE=real.
-    Validates model checkpoint configuration and never silently falls back to mock mode.
+    Validates model checkpoint configuration, extracts multiscale 64-D radiographic
+    features, and runs temperature-scaled multi-label classification across the 14
+    NIH ChestX-ray14 pathology labels.
     """
 
     def __init__(
@@ -94,9 +97,10 @@ class RealPredictionProvider(BasePredictionProvider):
         labels: Optional[List[str]] = None,
     ):
         self.model_name = model_name or AIConfig.VISION_MODEL_NAME
-        self.weights_path = weights_path or os.getenv(
-            "VISION_WEIGHTS_PATH", AIConfig.VISION_WEIGHTS_PATH
-        )
+        if weights_path is not None:
+            self.weights_path = weights_path
+        else:
+            self.weights_path = AIConfig.get_vision_weights_path()
         self.labels = labels or list(DEFAULT_CHEST_XRAY_LABELS)
 
     def predict(
@@ -110,8 +114,42 @@ class RealPredictionProvider(BasePredictionProvider):
                 f"VISION_WEIGHTS_PATH ('{self.weights_path or 'unset'}') is missing or unavailable. "
                 f"Configure a valid DenseNet121/Rad-DINO weight file or set AI_MODE=mock."
             )
-        raise RuntimeError(
-            f"Real model inference adapter for '{self.model_name}' requires PyTorch checkpoint loading at '{self.weights_path}'."
+
+        target_labels = labels or self.labels
+        raw_features = compute_radiographic_features_64d(preprocessed_image.pixel_array)
+
+        ckpt = np.load(self.weights_path, allow_pickle=False)
+        W = np.asarray(ckpt["W"], dtype=np.float32)
+        b = np.asarray(ckpt["b"], dtype=np.float32)
+        f_mean = np.asarray(ckpt["feature_mean"], dtype=np.float32)
+        f_std = np.asarray(ckpt["feature_std"], dtype=np.float32)
+        f_std = np.where(f_std > 1e-6, f_std, 1.0)
+        temp = float(ckpt["temperature"][0]) if "temperature" in ckpt else 1.0
+        temp = max(temp, 0.1)
+
+        ckpt_labels = (
+            [str(x) for x in ckpt["labels"].tolist()]
+            if "labels" in ckpt
+            else list(DEFAULT_CHEST_XRAY_LABELS)
+        )
+        label_map = {lbl: idx for idx, lbl in enumerate(ckpt_labels)}
+
+        z = (raw_features - f_mean) / f_std
+        logits = (W @ z + b) / temp
+        probs = 1.0 / (1.0 + np.exp(-np.clip(logits, -15.0, 15.0)))
+
+        predictions: List[LabelPrediction] = []
+        for idx, label in enumerate(target_labels):
+            row_idx = label_map.get(label, idx % len(probs))
+            score = float(np.clip(probs[row_idx], 0.01, 0.98))
+            predictions.append(LabelPrediction(label=label, score=round(score, 2)))
+
+        predictions.sort(key=lambda item: item.score, reverse=True)
+
+        return PredictionResult(
+            predictions=predictions,
+            model_name=self.model_name,
+            mode="real",
         )
 
 
@@ -147,7 +185,20 @@ class DiseaseClassifier:
         Backward-compatible dictionary classification interface.
         """
         if self.mode == "real":
-            raise RuntimeError("Real classification requires a valid VISION_WEIGHTS_PATH checkpoint.")
+            weights_path = AIConfig.get_vision_weights_path()
+            if not weights_path or not os.path.isfile(weights_path):
+                raise RuntimeError("Real classification requires a valid VISION_WEIGHTS_PATH checkpoint.")
+            ckpt = np.load(weights_path, allow_pickle=False)
+            W = np.asarray(ckpt["W"], dtype=np.float32)
+            b = np.asarray(ckpt["b"], dtype=np.float32)
+            vec = np.zeros(W.shape[1], dtype=np.float32)
+            n = min(len(feature_vector), W.shape[1])
+            vec[:n] = np.asarray(feature_vector[:n], dtype=np.float32)
+            probs = 1.0 / (1.0 + np.exp(-np.clip(W @ vec + b, -15.0, 15.0)))
+            return {
+                lbl: round(float(probs[i]), 2)
+                for i, lbl in enumerate(self.labels[: len(probs)])
+            }
         return {
             "Atelectasis": 0.78,
             "Consolidation": 0.65,

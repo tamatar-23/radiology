@@ -2,8 +2,9 @@
 Seed Sample Data Script
 Owner: Shivam (Backend & DB) / Shreyansh (Data Management)
 
-Generates a synthetic non-patient grayscale Chest X-Ray test phantom (`data/samples/sample_cxr.png`)
-and seeds an initial Scan and Report record into the configured database for local development.
+Generates a synthetic non-patient grayscale Chest X-Ray test phantom (`data/samples/sample_cxr.png`),
+ensures the calibrated vision model checkpoint and ChromaDB vector store are initialized,
+and seeds an initial Scan and Report record into the configured database.
 """
 
 import os
@@ -40,8 +41,9 @@ def generate_synthetic_cxr_phantom(output_path: Path) -> Path:
     # Simulated cardiomediastinal silhouette (central brighter region)
     draw.ellipse((205, 195, 325, 365), fill=165)
 
-    # Simulated right lower zone subtle opacity for test feature variance
-    draw.ellipse((125, 285, 210, 355), fill=115)
+    # Simulated right lower zone opacity & costophrenic blunting for test feature variance
+    draw.ellipse((115, 280, 225, 375), fill=142)
+    draw.line((110, 320, 220, 305), fill=175, width=4)
 
     img.save(output_path, format="PNG")
     return output_path
@@ -53,10 +55,19 @@ def seed_database() -> None:
     from backend.app.schemas.radiology import AnalysisRequest
     from backend.app.services.analysis_service import AnalysisService
     from ai.vision.preprocessing import ChestXRayPreprocessor
+    from ai.vision.model import ensure_default_vision_weights
+    from ai.rag.vector_store import MedicalVectorStore
 
     sample_png = REPO_ROOT / "data" / "samples" / "sample_cxr.png"
     generate_synthetic_cxr_phantom(sample_png)
     print(f"[seed] Generated synthetic Chest X-Ray phantom at: {sample_png}")
+
+    weights_path = ensure_default_vision_weights()
+    print(f"[seed] Verified vision model checkpoint at: {weights_path}")
+
+    vstore = MedicalVectorStore()
+    chunk_count = vstore.ensure_indexed()
+    print(f"[seed] Indexed {chunk_count} thoracic literature chunks in ChromaDB ({vstore.persist_directory})")
 
     init_db()
     preprocessor = ChestXRayPreprocessor()
@@ -84,11 +95,15 @@ def seed_database() -> None:
         report = service.run_analysis(
             AnalysisRequest(
                 scan_id="scan_sample_cxr_001",
-                notes="Synthetic Chest X-Ray test phantom for pipeline verification.",
+                notes="Evaluate right lower lung zone opacity for basal atelectasis or pleural effusion.",
             ),
             db=db,
         )
-        print(f"[seed] Generated sample mock report: {report.report_id} (mode={report.mode})")
+        print(
+            f"[seed] Generated radiology report: {report.report_id} "
+            f"(mode={report.mode}, evidence_citations={len(report.evidence)}, "
+            f"heatmap_available={report.heatmap_available})"
+        )
     finally:
         db.close()
 

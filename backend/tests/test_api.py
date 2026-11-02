@@ -1,7 +1,8 @@
 """
 Automated Integration Tests for the FastAPI Backend
 Tests /health, /api/upload, /api/analyze, /api/report/{report_id},
-input validation, database persistence, and mock vs real mode behavior.
+/api/scans/{scan_id}/heatmap, /api/samples/cxr, input validation,
+database persistence, and both mock and real execution modes.
 """
 
 import io
@@ -16,6 +17,8 @@ from sqlalchemy.pool import StaticPool
 from backend.app.main import app
 from backend.app.db.models import Base
 from backend.app.db.database import get_db
+from ai.vision.model import ensure_default_vision_weights
+from ai.rag.vector_store import MedicalVectorStore
 
 
 # Use an isolated in-memory SQLite database for automated tests
@@ -132,6 +135,59 @@ def test_successful_upload_and_analyze_and_report_retrieval(monkeypatch, tmp_pat
     assert persisted["scan_id"] == scan_id
     assert persisted["impression"] == report_data["impression"]
     assert len(persisted["predictions"]) == 14
+
+
+def test_end_to_end_real_mode_pipeline_with_heatmap_and_chromadb(monkeypatch, tmp_path):
+    weights_file = str(tmp_path / "densenet121_cxr_weights.npz")
+    chroma_dir = str(tmp_path / "chroma_db")
+    ensure_default_vision_weights(weights_file)
+    MedicalVectorStore(persist_directory=chroma_dir).ensure_indexed()
+
+    monkeypatch.setenv("AI_MODE", "real")
+    monkeypatch.setenv("UPLOAD_DIR", str(tmp_path))
+    monkeypatch.setenv("VISION_WEIGHTS_PATH", weights_file)
+    monkeypatch.setenv("CHROMA_PERSIST_DIR", chroma_dir)
+    monkeypatch.setenv("LLM_PROVIDER", "local_grounded")
+
+    # 1. Fetch sample CXR from /api/samples/cxr
+    sample_res = client.get("/api/samples/cxr")
+    assert sample_res.status_code == 200
+    assert sample_res.headers["content-type"] in ("image/jpeg", "image/png")
+
+    # 2. Upload sample CXR
+    upload_res = client.post(
+        "/api/upload",
+        files={"file": ("dataset-card.jpeg", sample_res.content, sample_res.headers["content-type"])},
+    )
+    assert upload_res.status_code == 200
+    scan_id = upload_res.json()["scan_id"]
+
+    # 3. Run Real Analysis
+    analyze_res = client.post(
+        "/api/analyze",
+        json={
+            "scan_id": scan_id,
+            "notes": "Evaluate right lower lung zone for atelectasis or pleural effusion",
+        },
+    )
+    assert analyze_res.status_code == 200
+    report_data = analyze_res.json()
+
+    assert report_data["mode"] == "real"
+    assert "RESEARCH PROTOTYPE" in report_data["disclaimer"]
+    assert len(report_data["predictions"]) == 14
+    assert report_data["heatmap_available"] is True
+    assert report_data["heatmap_url"] == f"/api/scans/{scan_id}/heatmap"
+    assert report_data["evidence_status"] == "sufficient"
+    assert len(report_data["evidence"]) >= 1
+    assert "DEMO MODE" not in report_data["impression"]
+    assert all(stage["mode"] == "real" for stage in report_data["agent_trace"])
+
+    # 4. Fetch generated Grad-CAM heatmap PNG
+    heatmap_res = client.get(report_data["heatmap_url"])
+    assert heatmap_res.status_code == 200
+    assert heatmap_res.headers["content-type"] == "image/png"
+    assert len(heatmap_res.content) > 500
 
 
 def test_analyze_invalid_scan_id_returns_404(monkeypatch):

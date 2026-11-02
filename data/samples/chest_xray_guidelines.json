@@ -3,35 +3,105 @@
     "document_id": "fleischner-glossary-2008-atelectasis",
     "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Atelectasis",
     "source_url": "https://doi.org/10.1148/radiol.2462070712",
-    "keywords": ["atelectasis", "collapse", "volume loss", "opacity", "subsegmental", "linear"],
+    "keywords": ["atelectasis", "collapse", "volume loss", "opacity", "subsegmental", "linear", "fissure", "hemidiaphragm"],
     "content": "Atelectasis refers to reduced inflation of all or part of the lung. Radiographic findings include increased attenuation or opacity in the affected lung parenchyma accompanied by direct or indirect signs of volume loss, such as displacement of interlobar fissures, elevation of the ipsilateral hemidiaphragm, mediastinal shift toward the affected side, or crowding of pulmonary vessels and bronchi. Subsegmental (discoid or platelike) atelectasis commonly appears as linear horizontal or oblique opacities in the lower lung zones."
   },
   {
     "document_id": "fleischner-glossary-2008-consolidation",
     "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Consolidation",
     "source_url": "https://doi.org/10.1148/radiol.2462070712",
-    "keywords": ["consolidation", "pneumonia", "infiltration", "airspace", "opacity", "air bronchogram"],
+    "keywords": ["consolidation", "airspace", "opacity", "air bronchogram", "alveolar", "attenuation", "lobar"],
     "content": "Consolidation appears on chest radiographs as a homogeneous increase in pulmonary parenchymal attenuation that obscures the margins of vessels and airway walls. An air bronchogram may be present when air-filled bronchi traverse the opacified alveoli. Consolidation indicates replacement of alveolar air by fluid, pus, blood, cells, or other material, and is a classic radiographic manifestation of bacterial pneumonia, pulmonary hemorrhage, or organizing pneumonia."
   },
   {
     "document_id": "acr-chest-radiography-pleural-effusion",
     "document_title": "ACR Appropriateness Criteria & Thoracic Radiography Reference — Pleural Effusion",
     "source_url": "https://www.acr.org/Clinical-Resources/ACR-Appropriateness-Criteria",
-    "keywords": ["effusion", "pleural effusion", "costophrenic", "blunting", "meniscus", "fluid"],
+    "keywords": ["effusion", "pleural effusion", "costophrenic", "blunting", "meniscus", "fluid", "subpulmonic"],
     "content": "On upright posteroanterior and lateral chest radiographs, free pleural fluid typically accumulates in the most dependent recesses of the thoracic cavity, producing blunting of the posterior and lateral costophrenic sulci with a characteristic concave meniscus sign. Larger pleural effusions cause homogeneous basal opacification obscuring the ipsilateral hemidiaphragm and may shift the mediastinum contralaterally unless accompanied by underlying lobar atelectasis."
   },
   {
-    "document_id": "thoracic-radiography-cardiomegaly-edema",
-    "document_title": "Standard Thoracic Radiography Criteria — Cardiomegaly and Pulmonary Edema",
+    "document_id": "thoracic-radiography-cardiomegaly",
+    "document_title": "Standard Thoracic Radiography Criteria — Cardiomegaly and Cardiac Silhouette Assessment",
     "source_url": "https://radiopaedia.org/articles/cardiothoracic-ratio",
-    "keywords": ["cardiomegaly", "edema", "cardiothoracic", "silhouette", "vascular", "interstitial"],
-    "content": "On a standard upright posteroanterior (PA) chest radiograph, the cardiothoracic ratio (CTR) is measured as the maximal horizontal cardiac diameter divided by the maximal internal thoracic diameter; a ratio exceeding 0.50 is a commonly cited radiographic indicator of cardiomegaly on PA projections. Associated pulmonary venous hypertension and interstitial pulmonary edema may manifest with cephalization of pulmonary vessels, peribronchial cuffing, and septal lines (Kerley B lines)."
+    "keywords": ["cardiomegaly", "cardiothoracic", "silhouette", "heart", "ventricular", "pericardial", "enlargement"],
+    "content": "On a standard upright posteroanterior (PA) chest radiograph, the cardiothoracic ratio (CTR) is measured as the maximal horizontal cardiac diameter divided by the maximal internal thoracic diameter; a ratio exceeding 0.50 is a widely accepted radiographic indicator of cardiomegaly on PA projections. Apparent cardiac silhouette enlargement on anteroposterior (AP) supine or portable radiographs must be interpreted cautiously due to geometric magnification."
   },
   {
-    "document_id": "fleischner-glossary-2008-pneumothorax-nodule",
-    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pneumothorax and Pulmonary Nodule",
+    "document_id": "thoracic-radiography-pulmonary-edema",
+    "document_title": "ACR & Fleischner Thoracic Imaging Criteria — Pulmonary Edema",
     "source_url": "https://doi.org/10.1148/radiol.2462070712",
-    "keywords": ["pneumothorax", "nodule", "mass", "pleural line", "emphysema", "fibrosis"],
-    "content": "Pneumothorax refers to the presence of gas in the pleural space, identified on chest radiography by a visible visceral pleural line with absence of pulmonary vascular markings peripheral to that line. A pulmonary nodule is defined as a rounded or irregular opacity, well or poorly defined, measuring up to 3 cm in diameter on chest radiographs or CT, whereas focal pulmonary lesions exceeding 3 cm in diameter are classified as pulmonary masses."
+    "keywords": ["edema", "pulmonary edema", "cephalization", "kerley", "interstitial", "perihilar", "batwing", "vascular"],
+    "content": "Pulmonary edema results from abnormal accumulation of extravascular fluid in the lung interstitium and alveoli. Early hydrostatic interstitial edema manifests on chest radiographs with upper lobe pulmonary venous diversion (cephalization), peribronchial cuffing, indistinct pulmonary vessels, and interlobular septal thickening (Kerley B lines at the lung bases). Progression to alveolar edema produces bilateral symmetric perihilar airspace opacities and pleural effusions."
+  },
+  {
+    "document_id": "acr-community-acquired-pneumonia",
+    "document_title": "ACR Appropriateness Criteria — Acute Respiratory Illness and Pneumonia",
+    "source_url": "https://www.acr.org/Clinical-Resources/ACR-Appropriateness-Criteria",
+    "keywords": ["pneumonia", "infection", "bronchopneumonia", "airspace", "consolidation", "infiltrate", "fever", "cough"],
+    "content": "Chest radiography is the primary initial imaging modality for suspected community-acquired or nosocomial pneumonia. Radiographic patterns include focal lobar or segmental airspace consolidation with air bronchograms, patchy multifocal bronchopneumonia opacities, or diffuse bilateral interstitial and ground-glass infiltrates. Parapneumonic pleural effusion and cavitation should be systematically evaluated on follow-up radiographs."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-infiltration",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Infiltration and Parenchymal Opacification",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["infiltration", "infiltrate", "opacity", "parenchymal", "ill-defined", "hazy", "ground-glass"],
+    "content": "In historical and multi-label chest radiograph datasets such as NIH ChestX-ray14, infiltration denotes an ill-defined region of increased pulmonary parenchymal attenuation (airspace or mixed interstitial-alveolar opacity) whose margins are indistinct. The Fleischner Society recommends describing such regions specifically as opacity, consolidation, or ground-glass attenuation correlated with anatomic distribution and clinical presentation."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-nodule",
+    "document_title": "Fleischner Society Guidelines — Solitary and Multiple Pulmonary Nodules",
+    "source_url": "https://doi.org/10.1148/radiol.2017161659",
+    "keywords": ["nodule", "pulmonary nodule", "coin lesion", "calcification", "granuloma", "subsolid", "focal"],
+    "content": "A pulmonary nodule is defined on chest radiographs and CT as a rounded or irregular focal opacity, well or poorly defined, measuring up to 3.0 cm (30 mm) in maximum diameter. Evaluation on chest radiography includes assessment of size, margin spiculation or lobulation, internal calcification patterns (benign central, laminar, or popcorn calcification), and comparison with prior thoracic imaging to determine growth stability."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-mass",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pulmonary Mass",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["mass", "pulmonary mass", "lesion", "neoplasm", "carcinoma", "cavitation", "spiculated", "mediastinal"],
+    "content": "A pulmonary mass is any solid or partly solid pulmonary, pleural, or mediastinal lesion measuring greater than 3.0 cm (30 mm) in diameter without regard to contour, border, or internal homogeneity. Because focal parenchymal opacities larger than 3 cm carry a substantially elevated likelihood of primary bronchogenic carcinoma or metastatic disease, cross-sectional chest CT with contrast is indicated for staging and characterization."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-pneumothorax",
+    "document_title": "Fleischner Society & British Thoracic Society Guidelines — Pneumothorax",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["pneumothorax", "pleural line", "visceral pleura", "apical", "lucency", "tension", "mediastinal shift", "deep sulcus"],
+    "content": "Pneumothorax is the presence of gas within the pleural space. On upright chest radiographs, it is definitively identified by a sharply defined white visceral pleural line displaced medially from the chest wall, with absence of pulmonary vascular markings peripheral to that line. On supine radiographs, free pleural air may collect anteriorly and basally, producing a hyperlucent hemithorax or the deep sulcus sign. Contralateral cardiomediastinal shift and hemidiaphragmatic inversion suggest tension physiology."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-emphysema",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pulmonary Emphysema",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["emphysema", "hyperinflation", "bullae", "copd", "flattened hemidiaphragm", "retrosternal", "barrel chest", "lucency"],
+    "content": "Emphysema is characterized pathologically by permanent enlargement of airspaces distal to the terminal bronchiole accompanied by destruction of alveolar walls. Chest radiographic findings include pulmonary hyperinflation with flattening or inversion of the bilateral hemidiaphragms on PA and lateral views, increased retrosternal clear space, hyperlucency of the lung fields, attenuation and pruning of peripheral pulmonary vasculature, and focal bullae."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-fibrosis",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pulmonary Fibrosis",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["fibrosis", "reticular", "honeycombing", "interstitial", "traction bronchiectasis", "volume loss", "architectural distortion"],
+    "content": "Pulmonary fibrosis manifests on chest radiographs as coarse reticular or reticulonodular interstitial opacities, progressive parenchymal volume loss, architectural distortion, and upward or basal retraction of pulmonary structures depending on etiology. Advanced fibrotic interstitial lung disease demonstrates coarse peripheral reticulation, cystic honeycombing spaces, and traction bronchiectasis, typically requiring high-resolution chest CT (HRCT) for pattern classification."
+  },
+  {
+    "document_id": "fleischner-glossary-2008-pleural-thickening",
+    "document_title": "Fleischner Society: Glossary of Terms for Thoracic Imaging — Pleural Thickening and Plaques",
+    "source_url": "https://doi.org/10.1148/radiol.2462070712",
+    "keywords": ["pleural thickening", "pleural_thickening", "apical cap", "plaque", "fibrothorax", "pleura", "calcified", "costophrenic"],
+    "content": "Pleural thickening appears on chest radiographs as a soft-tissue stripe or band of increased attenuation along the chest wall, apex, or diaphragmatic surface. Bilateral apical pleural thickening (apical capping) is a common chronic finding with advancing age or prior granulomatous infection. Diffuse visceral and parietal pleural thickening (fibrothorax) may follow empyema or hemothorax, whereas discrete focal calcified or noncalcified pleural plaques are characteristic of prior asbestos exposure."
+  },
+  {
+    "document_id": "thoracic-radiography-hiatal-diaphragmatic-hernia",
+    "document_title": "Thoracic Radiography Reference — Hiatal and Diaphragmatic Hernia",
+    "source_url": "https://radiopaedia.org/articles/hiatus-hernia",
+    "keywords": ["hernia", "hiatal hernia", "diaphragmatic", "retrocardiac", "air-fluid level", "stomach", "mediastinal"],
+    "content": "On frontal and lateral chest radiographs, a sliding or paraesophageal hiatal hernia classically presents as a rounded retrocardiac soft-tissue mass superposed over the lower midline mediastinum, frequently containing an internal gas lucency or a distinct horizontal air-fluid level on upright projections. Congenital or post-traumatic diaphragmatic hernias may project bowel loops or omental fat above the expected contour of the hemidiaphragm."
+  },
+  {
+    "document_id": "acr-standard-pa-chest-radiography-protocol",
+    "document_title": "ACR–SPR–STR Practice Parameter for the Performance of Chest Radiography",
+    "source_url": "https://www.acr.org/Clinical-Resources/Practice-Parameters-and-Technical-Standards",
+    "keywords": ["posteroanterior", "standard", "inspiration", "rotation", "penetration", "normal", "thoracic", "protocol"],
+    "content": "Technical adequacy of a standard upright posteroanterior (PA) chest radiograph requires assessment of patient rotation (clavicular heads equidistant from the spinous processes), inspiratory effort (visualization of 9 to 10 posterior ribs or 6 anterior ribs above the right hemidiaphragmatic dome), and radiographic penetration (thoracic intervertebral disc spaces faintly visible through the cardiac silhouette). Systematic interpretation evaluates airways, lung zones, pleura, cardiomediastinal contours, and osseous structures."
   }
 ]

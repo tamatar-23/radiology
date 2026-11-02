@@ -16,6 +16,20 @@ import {
 const RAW_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000';
 export const API_BASE_URL = RAW_BASE_URL.replace(/\/+$/, '');
 
+export function resolveBackendUrl(urlOrPath: string): string {
+  if (!urlOrPath) return '';
+  if (
+    urlOrPath.startsWith('http://') ||
+    urlOrPath.startsWith('https://') ||
+    urlOrPath.startsWith('blob:') ||
+    urlOrPath.startsWith('data:')
+  ) {
+    return urlOrPath;
+  }
+  const normalizedPath = urlOrPath.startsWith('/') ? urlOrPath : `/${urlOrPath}`;
+  return `${API_BASE_URL}${normalizedPath}`;
+}
+
 export class ApiError extends Error {
   status: number;
 
@@ -92,6 +106,24 @@ export async function fetchReportById(reportId: string): Promise<ReportResponse>
     throw new ApiError(await parseErrorResponse(response), response.status);
   }
   return response.json();
+}
+
+export async function fetchSampleScanFile(): Promise<File> {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/samples/cxr`, {
+      method: 'GET',
+      cache: 'no-store',
+    });
+    if (response.ok) {
+      const blob = await response.blob();
+      return new File([blob], 'dataset-card.jpeg', { type: blob.type || 'image/jpeg' });
+    }
+  } catch {
+    // Fallback to static copy in public/dataset-card.jpeg
+  }
+  const fallbackRes = await fetch('/dataset-card.jpeg', { cache: 'no-store' });
+  const blob = await fallbackRes.blob();
+  return new File([blob], 'dataset-card.jpeg', { type: 'image/jpeg' });
 }
 
 export function getScanImageEndpointUrl(scanId: string): string {
