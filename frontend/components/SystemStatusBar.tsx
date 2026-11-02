@@ -22,9 +22,9 @@ export function SystemStatusBar({
   return (
     <section
       aria-label="Backend Health"
-      className="bg-white border border-slate-200 rounded-md px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs"
+      className="flex flex-wrap items-center gap-3 text-xs"
     >
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">Backend:</span>
           {checkingHealth ? (
@@ -40,12 +40,16 @@ export function SystemStatusBar({
           )}
         </div>
 
+        <span className="text-slate-300 hidden sm:inline">|</span>
+
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">Database:</span>
           <span className="font-mono text-slate-800">
             {health ? health.database_status : 'Unavailable'}
           </span>
         </div>
+
+        <span className="text-slate-300 hidden sm:inline">|</span>
 
         <div className="flex items-center gap-1.5">
           <span className="text-slate-500">Mode:</span>

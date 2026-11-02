@@ -12,12 +12,12 @@ The repository uses a modular monorepo design separating the **Next.js 14 Fronte
 ```mermaid
 flowchart TB
     subgraph Frontend["Next.js 14 Research Dashboard (frontend/)"]
-        UI_UP["UploadPanel.tsx (Upload + 1-Click Sample CXR)"]
-        UI_VW["ImageViewer.tsx (Radiograph + Grad-CAM Toggle)"]
-        UI_PR["PredictionPanel.tsx (14 NIH Labels)"]
-        UI_RP["ReportPanel.tsx (Findings, Impression & Citations)"]
-        UI_TR["AgentTracePanel.tsx (7-Stage Trace)"]
-        UI_ST["SystemStatusBar.tsx (Live Health & Mode)"]
+        UI_ST["Top Bar: Title + SystemStatusBar.tsx (Backend Health & Mode)"]
+        UI_UP["Left Col: UploadPanel.tsx (Upload + Default dataset-card.jpeg)"]
+        UI_VW["Left Col: ImageViewer.tsx (Original + Grad-CAM Toggle)"]
+        UI_PR["Left Col: PredictionPanel.tsx (Vertical Abnormality Scores)"]
+        UI_RP["Right Col: ReportPanel.tsx (Full-Height Impression, Findings & Citations)"]
+        UI_TR["Bottom: AgentTracePanel.tsx (7-Stage Vertical Step Flow)"]
         API_CL["Central Typed API Client (lib/api.ts)"]
     end
 

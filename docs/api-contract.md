@@ -163,4 +163,4 @@ Streams the generated Grad-CAM spatial activation overlay image (`image/png`) fo
 
 ## 7. `GET /api/samples/cxr`
 
-Streams the synthetic Chest X-Ray test phantom (`data/samples/sample_cxr.png`) so the frontend **"Load Sample CXR"** button can load a demo radiograph with one click.
+Streams the default Chest X-Ray sample image (`data/samples/dataset-card.jpeg`, `image/jpeg`, with fallback to `data/samples/sample_cxr.png`) so the frontend preloads and analyzes the default radiograph out of the box.

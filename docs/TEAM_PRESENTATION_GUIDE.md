@@ -196,16 +196,15 @@ flowchart LR
 1. **Strict Type-Safe Contract Synchronization (`frontend/types/radiology.ts` & `frontend/lib/api.ts`)**:
    - Every TypeScript interface (`ReportResponse`, `LabelPrediction`, `EvidenceCitation`, `AgentStageTrace`, `HealthCheckResponse`) maps 1-to-1 to the FastAPI Pydantic v2 models.
    - `lib/api.ts` centralizes all `fetch` calls, parses FastAPI `detail` error payloads into typed `ApiError` exceptions, and resolves relative backend paths (`/api/scans/{id}/heatmap`) to full URLs.
-2. **5 Modular Research Dashboard Panels**:
-   - **`SystemStatusBar`**: Live polling of `/health` showing DB status, `REAL AI` vs `MOCK` mode badge, benchmark accuracy, Grad-CAM readiness, ChromaDB chunk count, and active LLM provider.
-   - **`UploadPanel`**: Drag-and-drop PNG/JPEG uploader + 1-click **"Load Sample CXR"** button + clinical indication notes input.
-   - **`ImageViewer`**: Tabbed radiograph viewport switching between the **Original Radiograph** and the **Grad-CAM Heatmap** overlay, plus pixel dimension and intensity metadata (`Mean ± SD`).
-   - **`PredictionPanel`**: Visualizes the top 8 of 14 pathology scores with threshold highlighting ($\ge 0.50$).
-   - **`ReportPanel` & `AgentTracePanel`**: Displays the synthesized Impression, Structured Findings, clickable DOI source links with chunk IDs, and the 7-stage LangGraph execution timeline with per-node millisecond latency.
+2. **Cohesive 5-Tile Research Dashboard Layout**:
+   - **Unified Top Bar (`page.tsx` + `SystemStatusBar.tsx`)**: Displays the project title and live `/health` status (`Backend: Online | Database: connected (sqlite) | Mode: REAL | Refresh`).
+   - **Left Column (`UploadPanel.tsx`, `ImageViewer.tsx`, `PredictionPanel.tsx`)**: Preloads `dataset-card.jpeg` on startup, provides drag-and-drop PNG/JPEG upload and clinical notes input, toggles between **Original** and **Grad-CAM** radiograph views, and renders the top 6 **Abnormality Scores** in a vertical list (`uncalibrated model output`).
+   - **Right Column (`ReportPanel.tsx`)**: Full-height card aligned flush with the left column, displaying the synthesized **Impression**, **Findings**, and retrieved **Citations** with `chunk_id` and relevance scores.
+   - **Bottom Section (`AgentTracePanel.tsx`)**: Full-width **Agent Execution Trace (LangGraph Pipeline)** rendered as a 7-stage vertical step flow (`01` $\rightarrow$ `07`) with green `COMPLETED` badges and millisecond timing.
 
 #### Expected Professor Viva Questions for Shreyash
 - **Q: What happens in the frontend if the backend returns an error or a stage is flagged by the Verification Gate?**
-  - **A**: Unlike naive prototypes that silently catch errors and display hardcoded fallback text, our `api.ts` throws an `ApiError` that renders a visible rose alert banner (`role="alert"`). When the RAG verification gate flags a report (`evidence_status = "insufficient"` or `"unverified_claims"`), `ReportPanel` and `AgentTracePanel` dynamically switch their status badges from emerald (`Completed`) to amber (`Flagged`) to alert the researcher.
+  - **A**: Unlike naive prototypes that silently catch errors and display hardcoded fallback text, our `api.ts` throws an `ApiError` that renders a visible rose alert banner (`role="alert"`). When a pipeline stage completes or is flagged, `AgentTracePanel` dynamically styles each step in the vertical timeline as green (`COMPLETED`) or amber (`FLAGGED`).
 
 ---
 
@@ -221,6 +220,6 @@ flowchart LR
    npm run dev
    ```
 3. **Open `http://localhost:3000`**:
-   - Click **"Load Sample CXR"** $\rightarrow$ Click **"Upload & Analyze Chest X-Ray"**.
-   - Show the **Original Radiograph** tab and then click the **Grad-CAM Heatmap** tab.
-   - Point out the **14-Label Abnormality Scores**, the **Retrieved Thoracic Literature Citations** (`[fleischner-glossary-2008-...]`), and the **7-Stage Agent Execution Trace** at the bottom right.
+   - `dataset-card.jpeg` is preloaded automatically on startup $\rightarrow$ Click **"Analyze Chest X-Ray"**.
+   - Show the **Original** tab and then click the **Grad-CAM** tab in the image viewer.
+   - Point out the vertical **Abnormality Scores** on the bottom-left, the **Report** (`Impression`, `Findings`, and `Citations`) on the right, and the 7-stage vertical step-flow **Agent Execution Trace (LangGraph Pipeline)** at the bottom.

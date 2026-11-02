@@ -20,7 +20,7 @@ The **Multimodal Agentic Radiology Assistant** combines medical image preprocess
 
 ## 2. Architecture Overview
 
-1. **Frontend (`frontend/`)**: Next.js 14 (App Router), TypeScript, Tailwind CSS, and Lucide React dashboard composed of modular panels (`SystemStatusBar`, `UploadPanel`, `ImageViewer`, `PredictionPanel`, `ReportPanel`, `AgentTracePanel`) communicating through a central typed API client (`frontend/lib/api.ts`). Includes a 1-click **"Load Sample CXR"** button and a live **Grad-CAM Heatmap** tab.
+1. **Frontend (`frontend/`)**: Next.js 14 (App Router), TypeScript, and Tailwind CSS dashboard composed of modular tiles (`SystemStatusBar`, `UploadPanel`, `ImageViewer`, `PredictionPanel`, `ReportPanel`, `AgentTracePanel`) communicating through a central typed API client (`frontend/lib/api.ts`). Preloads `dataset-card.jpeg` on startup, provides a `Default Image (dataset-card.jpeg)` button, an `Original` / `Grad-CAM` image viewer toggle, a vertical abnormality score list, a full-height report panel, and a vertical step-flow `Agent Execution Trace (LangGraph Pipeline)` at the bottom.
 2. **Backend (`backend/`)**: FastAPI service layer separating configuration (`config.py`), SQLAlchemy ORM persistence (`db/models.py`), Pydantic v2 schemas (`schemas/radiology.py`), business services (`services/storage_service.py`, `services/analysis_service.py`), and thin REST route handlers (`api/endpoints.py`).
 3. **AI Package (`ai/`)**: Framework-independent Python package (`ai/common`, `ai/vision`, `ai/classification`, `ai/rag`, `ai/embeddings`, `ai/tests`) importable and testable without starting FastAPI.
 
@@ -104,8 +104,9 @@ radiology/
 │   │   ├── densenet121_cxr_weights.npz
 │   │   └── evaluation_metrics.json
 │   ├── processed/                      # Persisted 384-D vector index (chroma_db/)
-│   ├── samples/                        # 15 thoracic guidelines & synthetic CXR phantom
+│   ├── samples/                        # 15 thoracic guidelines & default CXR samples
 │   │   ├── chest_xray_guidelines.json
+│   │   ├── dataset-card.jpeg
 │   │   └── sample_cxr.png
 │   └── uploads/                        # Uploaded scans & generated Grad-CAM PNGs
 │
@@ -182,8 +183,8 @@ npm run dev
 ```
 
 - Open `http://localhost:3000` in your browser.
-- Click **"Load Sample CXR"** (or drag-and-drop any `.png` / `.jpg` Chest X-Ray) and click **"Upload & Analyze Chest X-Ray"**.
-- Switch between **Original Radiograph** and **Grad-CAM Heatmap** in Panel 2, inspect the 14 pathology scores in Panel 3, review the grounded report and `[chunk_id]` citations in Panel 4, and inspect the 7-stage LangGraph trace in Panel 5.
+- `dataset-card.jpeg` is preloaded automatically on startup (or click **"Default Image (dataset-card.jpeg)"** / drag-and-drop any `.png` or `.jpg` Chest X-Ray), then click **"Analyze Chest X-Ray"**.
+- Switch between **Original** and **Grad-CAM** in the viewer tile, inspect the vertical **Abnormality Scores** list on the left, review the grounded **Report** (`Impression`, `Findings`, and `Citations`) on the right, and inspect the 7-stage vertical step-flow **Agent Execution Trace (LangGraph Pipeline)** at the bottom.
 
 ---
 
@@ -210,7 +211,7 @@ npm run dev
 | `GET` | `/api/report/{report_id}` | Retrieves a persisted `ReportResponse` by its UUID |
 | `GET` | `/api/scans/{scan_id}/image` | Streams the stored Chest X-Ray image file |
 | `GET` | `/api/scans/{scan_id}/heatmap` | Streams the generated Grad-CAM spatial activation overlay PNG |
-| `GET` | `/api/samples/cxr` | Streams `data/samples/sample_cxr.png` for 1-click frontend demo loading |
+| `GET` | `/api/samples/cxr` | Streams `data/samples/dataset-card.jpeg` (fallback `sample_cxr.png`) as the default sample Chest X-Ray |
 
 ---
 

@@ -10,7 +10,7 @@ interface AgentTracePanelProps {
 
 export function AgentTracePanel({ trace, mode }: AgentTracePanelProps) {
   return (
-    <div className="bg-white border border-slate-200 rounded-md p-4 space-y-3">
+    <div className="bg-white border border-slate-200 rounded-md p-4 space-y-4 shadow-sm">
       <div className="flex items-center justify-between border-b border-slate-100 pb-2">
         <h2 className="text-sm font-semibold text-slate-900">
           Agent Execution Trace (LangGraph Pipeline)
@@ -28,28 +28,43 @@ export function AgentTracePanel({ trace, mode }: AgentTracePanelProps) {
           No execution trace yet.
         </div>
       ) : (
-        <ol className="grid grid-cols-1 md:grid-cols-2 gap-2">
-          {trace.map((step, index) => (
-            <li
-              key={step.stage_id}
-              className="p-2.5 rounded border border-slate-200 bg-slate-50 flex items-start justify-between gap-2 text-xs"
-            >
-              <div className="space-y-0.5">
-                <div className="flex items-center gap-2">
-                  <span className="font-mono text-slate-400">0{index + 1}</span>
-                  <span className="font-semibold text-slate-900">{step.stage_name}</span>
-                  <span className="text-[11px] font-mono uppercase text-slate-500">
-                    [{step.status}]
+        <ol className="relative border-l-2 border-emerald-200 ml-3 space-y-3">
+          {trace.map((step, index) => {
+            const isCompleted = step.status === 'completed';
+            return (
+              <li key={step.stage_id} className="relative pl-5">
+                <span
+                  className={`absolute -left-[9px] top-3.5 h-4 w-4 rounded-full border-2 flex items-center justify-center ${
+                    isCompleted
+                      ? 'bg-emerald-500 border-emerald-100'
+                      : 'bg-amber-500 border-amber-100'
+                  }`}
+                />
+                <div className="p-3 rounded border border-slate-200 bg-slate-50 flex items-start justify-between gap-3 text-xs">
+                  <div className="space-y-1">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-mono text-slate-400">0{index + 1}</span>
+                      <span className="font-semibold text-slate-900">{step.stage_name}</span>
+                      <span
+                        className={`px-2 py-0.5 rounded text-[11px] font-mono uppercase border font-semibold ${
+                          isCompleted
+                            ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border-amber-200'
+                        }`}
+                      >
+                        {step.status}
+                      </span>
+                    </div>
+                    <p className="text-slate-600">{step.details}</p>
+                  </div>
+
+                  <span className="font-mono text-slate-500 flex-shrink-0">
+                    {step.duration_ms.toFixed(1)} ms
                   </span>
                 </div>
-                <p className="text-slate-600">{step.details}</p>
-              </div>
-
-              <span className="font-mono text-slate-500 flex-shrink-0">
-                {step.duration_ms.toFixed(1)} ms
-              </span>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ol>
       )}
     </div>

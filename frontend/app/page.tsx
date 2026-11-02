@@ -126,31 +126,31 @@ export default function RadiologyDashboardPage() {
     report?.image_metadata || uploadedScan?.image_metadata || null;
 
   return (
-    <main className="max-w-6xl mx-auto px-4 py-5 space-y-4">
-      <header className="border-b border-slate-200 pb-3">
-        <h1 className="text-lg font-semibold text-slate-900">
+    <main className="max-w-7xl mx-auto px-6 py-5 space-y-4">
+      <div className="bg-white border border-slate-200 rounded-md px-5 py-3 flex flex-col md:flex-row md:items-center md:justify-between gap-3 shadow-sm">
+        <h1 className="text-base font-semibold text-slate-900 tracking-tight">
           Multimodal Agentic Radiology Assistant
         </h1>
-      </header>
 
-      <SystemStatusBar
-        health={health}
-        healthError={healthError}
-        checkingHealth={checkingHealth}
-        onRefresh={refreshHealth}
-      />
+        <SystemStatusBar
+          health={health}
+          healthError={healthError}
+          checkingHealth={checkingHealth}
+          onRefresh={refreshHealth}
+        />
+      </div>
 
       {error && (
         <div
           role="alert"
-          className="bg-rose-50 border border-rose-200 text-rose-900 p-3 rounded text-xs"
+          className="bg-rose-50 border border-rose-200 text-rose-900 px-4 py-3 rounded-md text-xs"
         >
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-        <div className="lg:col-span-5 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+        <div className="lg:col-span-5 flex flex-col gap-4">
           <UploadPanel
             selectedFile={selectedFile}
             uploadedScan={uploadedScan}
@@ -174,16 +174,16 @@ export default function RadiologyDashboardPage() {
             heatmapUrl={report?.heatmap_url || null}
             explainabilityMessage={report?.explainability_message || null}
           />
-        </div>
-
-        <div className="lg:col-span-7 space-y-4">
-          <ReportPanel report={report} loading={analyzing} />
 
           <PredictionPanel
             predictions={report?.predictions || []}
             modelName={report?.model_name || null}
             mode={report?.mode || null}
           />
+        </div>
+
+        <div className="lg:col-span-7 flex flex-col">
+          <ReportPanel report={report} loading={analyzing} />
         </div>
       </div>
 

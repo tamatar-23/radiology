@@ -39,7 +39,7 @@ Standalone deep learning classifiers for chest radiographs output raw abnormalit
   - Real **Grad-CAM spatial activation heatmap** computation and PNG overlay serving (`GET /api/scans/{scan_id}/heatmap`), while honestly reporting unavailability in `AI_MODE=mock`.
   - 5-node LangGraph Agentic RAG workflow backed by 384-D `BiomedicalDenseEmbedder` vectors (`data/processed/chroma_db`) across 19 chunks from 15 thoracic guideline documents (**100% Recall@3**, **100% Citation Groundedness**).
   - Multi-provider LLM integration (`GEMINI_API_KEY`, `GROQ_API_KEY`, `OPENAI_API_KEY`, plus built-in offline `local_grounded` synthesis).
-  - Interactive Next.js 14 dashboard with 1-click sample CXR loading (`GET /api/samples/cxr`), original vs. Grad-CAM viewer tabs, abnormality score bars, structured findings/impression with clickable DOIs, and 7-stage execution trace.
+  - Interactive Next.js 14 dashboard preloaded with `data/samples/dataset-card.jpeg` (`GET /api/samples/cxr`), `Original` vs. `Grad-CAM` viewer tabs, vertical abnormality score bars, structured findings/impression with inline citations, and a bottom vertical step-flow 7-stage execution trace.
 
 ---
 
