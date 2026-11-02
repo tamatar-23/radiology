@@ -17,7 +17,6 @@ export function SystemStatusBar({
   onRefresh,
 }: SystemStatusBarProps) {
   const isConnected = Boolean(health && health.status === 'healthy');
-  const aiMode = health?.ai_mode || 'real';
 
   return (
     <section
@@ -46,15 +45,6 @@ export function SystemStatusBar({
           <span className="text-slate-500">Database:</span>
           <span className="font-mono text-slate-800">
             {health ? health.database_status : 'Unavailable'}
-          </span>
-        </div>
-
-        <span className="text-slate-300 hidden sm:inline">|</span>
-
-        <div className="flex items-center gap-1.5">
-          <span className="text-slate-500">Mode:</span>
-          <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-800 border border-slate-200 font-mono uppercase">
-            {aiMode}
           </span>
         </div>
 
